@@ -19,6 +19,10 @@ const url = 'https://egzamin-informatyk.pl/jedno-pytanie-inf02-ee08-sprzet-syste
         prawidlowaOdpowiedz:{
             type: String,
             required: true,
+        },
+        obrazek:{
+          type: String,
+          required: true,
         }
     })
     // Creating db schema
@@ -59,7 +63,7 @@ async function scrapeData() {
     document.getElementById('odpa').click();
   });
 
-  let obrazekURL = '';
+  let obrazekURL = 'Brak';
   const obrazekDiv = await page.$('.obrazek');
   if (obrazekDiv) {
     obrazekURL = await obrazekDiv.$eval('img', (img) => img.src);
