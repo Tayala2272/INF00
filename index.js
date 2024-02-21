@@ -1,7 +1,35 @@
 const puppeteer = require('puppeteer');
+const mongoose = require('mongoose')
 
 // Adres URL strony do analizy
 const url = 'https://egzamin-informatyk.pl/jedno-pytanie-inf02-ee08-sprzet-systemy-sieci/';
+
+
+    mongoose.connect('mongodb://localhost/inf')
+        .then(console.log('Connected to db'))
+        .catch(err=>console.log('Could not connect to mongodb...',err))
+
+
+  const pytaniaSchema = new mongoose.Schema({
+        pytanie: {
+            type: String,
+            required: true,
+        },
+        odpowiedzi:[],
+        prawidlowaOdpowiedz:{
+            type: String,
+            required: true,
+        }
+    })
+    // Creating db schema
+        const Pytanie = mongoose.model('inf02',pytaniaSchema)
+
+
+
+
+
+
+        
 
 // Funkcja do interakcji z przeglądarką i analizy danych
 async function scrapeData() {
@@ -16,9 +44,12 @@ async function scrapeData() {
   const tresc = await page.$eval('.tresc', (element) => element.textContent.trim());
 
   // Sprawdzenie, czy pytanie już istnieje w tabeli
-  if (czyJestWtabeli(tresc)) {
+  const jestWtabeli = await czyJestWtabeli(tresc)
+
+  if(jestWtabeli){
     console.log('Pytanie już istnieje w tabeli, pomijam.');
     await browser.close();
+    main()
     return;
   }
 
@@ -28,6 +59,12 @@ async function scrapeData() {
     document.getElementById('odpa').click();
   });
 
+  let obrazekURL = '';
+  const obrazekDiv = await page.$('.obrazek');
+  if (obrazekDiv) {
+    obrazekURL = await obrazekDiv.$eval('img', (img) => img.src);
+  }
+
   // Pobranie zawartości divów od "odpa" do "odpd"
     const odpaTekst = await page.$eval('#odpa', (element) => element.textContent.trim().substring(3));
     const odpbTekst = await page.$eval('#odpb', (element) => element.textContent.trim().substring(3));
@@ -35,6 +72,7 @@ async function scrapeData() {
     const odpdTekst = await page.$eval('#odpd', (element) => element.textContent.trim().substring(3));
 
     await page.waitForSelector('.odpgood');
+
   // Sprawdzenie, który div ma klasę "odpgood"
   let prawidlowaOdpowiedz;
   if (await page.$eval('#odpa', (element) => element.classList.contains('odpgood'))) {
@@ -56,28 +94,58 @@ async function scrapeData() {
       odpC: odpcTekst,
       odpD: odpdTekst,
     },
-    'prawidlowa-odpowiedz': prawidlowaOdpowiedz,
-  };
+    prawidlowaOdpowiedz: prawidlowaOdpowiedz,
+    obrazek: obrazekURL,
+  }
 
-  tabela.push(pytanie)
+  dodawanieDoBazy(pytanie)
   // TODO: Dodanie pytania do tabeli (implementacja zależy od kontekstu aplikacji)
 
   // Zamknięcie przeglądarki
   await browser.close();
 }
 
-  const tabela = {};
-// Funkcja sprawdzająca, czy pytanie już istnieje w tabeli
-function czyJestWtabeli(tresc) {
-  // TODO: Implementacja sprawdzania w tabeli (zależy od kontekstu aplikacji)
-  // Możesz użyć bazy danych, listy w pamięci, itp.
-  // Przykład zakłada użycie tablicy tymczasowej
-  return tabela.includes(tresc);
+
+
+
+async function dodawanieDoBazy(nowe) {
+    const pytanie = new Pytanie({
+        pytanie: nowe.pytanie,
+        odpowiedzi:{
+            odpA:nowe.odpowiedzi.odpA,
+            odpB:nowe.odpowiedzi.odpB,
+            odpC:nowe.odpowiedzi.odpC,
+            odpD:nowe.odpowiedzi.odpD
+        },
+        prawidlowaOdpowiedz:nowe.prawidlowaOdpowiedz,
+        obrazek: nowe.obrazek,
+    })
+
+    try {
+        const result = await pytanie.save().then(main())
+        console.log(result)
+    } catch (error) {
+        console.log(error)
+    }
 }
 
-// Wywołanie funkcji głównej
-for (let index = 0; index < 3; index++) {
-    
-    scrapeData();
-}
-console.log(tabela)
+
+
+
+
+
+
+
+
+
+async function czyJestWtabeli(slowo) {
+
+    const result = await Pytanie.findOne({ pytanie: slowo });
+    return result !== null;
+  }
+
+
+    function main(){
+        scrapeData()
+    }
+    main()
