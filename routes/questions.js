@@ -23,7 +23,7 @@
             const docRef = db.collection(req.params.collection).doc(""+randomIndex)
 
             docRef.get().then((result)=>{
-                res.send(result)
+                res.send(result.data())
             })
         })
     })
@@ -35,9 +35,15 @@
         const collectionRef = db.collection(req.params.collection);
         collectionRef.get().then(async(result)=>{
             db.collection(req.params.collection).doc(""+(result["_size"]+1)).set({
-                name: "Los Angeles",
-                state: "CA",
-                country: "USA"
+                pytanie: req.body.pytanie,
+                odpowiedzi: {
+                    odpA: req.body.odpowiedzi.odpA,
+                    odpB: req.body.odpowiedzi.odpB,
+                    odpC: req.body.odpowiedzi.odpC,
+                    odpD: req.body.odpowiedzi.odpD
+                },
+                prawidlowaOdpowiedz: req.body.prawidlowaOdpowiedz,
+                obrazek: req.body.obrazek,
             })
             .then(() => {
                 res.send("Document successfully written!")
