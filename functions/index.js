@@ -32,7 +32,7 @@ app.get("/api/questions/:collection", async (req, res)=>{
 
 
 // POST
-app.post("/api/question/:collection", async (req, res)=>{
+app.post("/api/questions/:collection", async (req, res)=>{
   const collectionRef = db.collection(req.params.collection);
   collectionRef.get().then(async (result)=>{
     db.collection(req.params.collection).doc(""+(result["_size"]+1)).set({
