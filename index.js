@@ -4,8 +4,6 @@
     const express = require('express')
     const app = express()
     app.use(express.json())
-    
-    const firebase = require('firebase');
 
 
 
@@ -14,7 +12,6 @@
     // questions
         const questions = require('./routes/questions')
         app.use('/api/questions', questions)
-
 
 
 // Aktywacja serwera
