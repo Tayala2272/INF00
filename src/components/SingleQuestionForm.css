@@ -1,0 +1,26 @@
+body {
+  justify-content: center;
+}
+.card-custom {
+  padding: 20px;
+  margin: 20px;
+}
+
+.card-img {
+  display: block;
+  margin: 20px auto; /* zmienione wartości margin */
+  max-width: 70%; /* dodane ograniczenie szerokości na 100% */
+  height: auto; /* automatyczne dopasowanie wysokości */
+}
+.btn-custom {
+  border-radius: 3px;
+  background-color: rgb(52, 50, 50);
+}
+
+.btn-wrong {
+  background-color: #ff4d4f; /* Czerwony kolor */
+}
+
+.btn-correct {
+  background-color: #52c41a; /* Zielony kolor */
+}
