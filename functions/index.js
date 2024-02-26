@@ -2,7 +2,6 @@
 // Express
 const express = require("express");
 const app = express();
-app.use(express.json());
 
 
 // Routes
@@ -28,6 +27,26 @@ app.get("/api/questions/:collection", async (req, res)=>{
   }).catch((error)=>{
     res.send(error);
   });
+});
+
+app.get("/api/questions/check/:collection", async (req, res)=>{
+  const collectionRef = db.collection(req.params.collection);
+  let question = req.query.pytanie;
+      if (!question) {
+        question = req.body.pytanie;
+      }
+
+  res.send(question)
+    // const query = await collectionRef
+    //   .where("pytanie", "==", question.pytanie)
+    //   .get()
+    //   .then((query)=>{
+    //     res.send(query.docs.length > 0);
+    //   })
+    //   .catch((error)=>{
+    //     console.error(error);
+    //     res.status(500).send(error.message);
+    //   })
 });
 
 
