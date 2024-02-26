@@ -16,12 +16,17 @@ app.get("/api/questions/:collection", async (req, res)=>{
   const collectionRef = db.collection(req.params.collection);
 
   collectionRef.get().then((result)=>{
-    const randomIndex = Math.floor(Math.random() * (result["_size"]+1));
+    const randomIndex = Math.floor(Math.random() * (result["_size"]+""))+1;
     const docRef = db.collection(req.params.collection).doc(""+randomIndex);
-
+    
     docRef.get().then((result)=>{
       res.send(result.data());
+    }).catch((error)=>{
+      res.send(error);
     });
+    
+  }).catch((error)=>{
+    res.send(error);
   });
 });
 
@@ -43,7 +48,9 @@ app.post("/api/question/:collection", async (req, res)=>{
     }).catch((error) => {
       res.send("Error writing document: ", error);
     });
-  });
+  }).catch((error)=>{
+    res.send(error);
+  });;
 });
 
 
