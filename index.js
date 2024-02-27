@@ -1,34 +1,7 @@
 const puppeteer = require('puppeteer');
-const mongoose = require('mongoose')
 
 // Adres URL strony do analizy
 const url = 'https://egzamin-informatyk.pl/jedno-pytanie-inf02-ee08-sprzet-systemy-sieci/';
-
-
-    mongoose.connect('mongodb://localhost/inf')
-        .then(console.log('Connected to db'))
-        .catch(err=>console.log('Could not connect to mongodb...',err))
-
-
-  const pytaniaSchema = new mongoose.Schema({
-        pytanie: {
-            type: String,
-            required: true,
-        },
-        odpowiedzi:[],
-        prawidlowaOdpowiedz:{
-            type: String,
-            required: true,
-        },
-        obrazek:{
-          type: String,
-          required: true,
-        }
-    })
-    // Creating db schema
-        const Pytanie = mongoose.model('inf02',pytaniaSchema)
-
-
 
 
 
@@ -113,40 +86,43 @@ async function scrapeData() {
 
 
 async function dodawanieDoBazy(nowe) {
-    const pytanie = new Pytanie({
-        pytanie: nowe.pytanie,
-        odpowiedzi:{
-            odpA:nowe.odpowiedzi.odpA,
-            odpB:nowe.odpowiedzi.odpB,
-            odpC:nowe.odpowiedzi.odpC,
-            odpD:nowe.odpowiedzi.odpD
+  const url = "https://app-3ltgtwxjda-uc.a.run.app/api/questions/inf02";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        prawidlowaOdpowiedz:nowe.prawidlowaOdpowiedz,
-        obrazek: nowe.obrazek,
-    })
+        body: JSON.stringify(nowe),
+      };
 
-    try {
-        const result = await pytanie.save().then(main())
-        console.log(result)
-    } catch (error) {
-        console.log(error)
-    }
+      const response = await fetch(url, options);
+      console.log(response);
 }
-
-
-
-
-
-
-
-
 
 
 async function czyJestWtabeli(slowo) {
 
-    const result = await Pytanie.findOne({ pytanie: slowo });
-    return result !== null;
-  }
+    // const result = await Pytanie.findOne({ pytanie: slowo });
+    // return result !== null;
+
+      const url = "https://app-3ltgtwxjda-uc.a.run.app/api/questions/check/inf02";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pytanie: slowo,
+        }),
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    }
+
+
+
 
 
     function main(){
