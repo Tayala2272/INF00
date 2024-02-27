@@ -16,7 +16,7 @@ app.get("/api/questions/:collection", async (req, res)=>{
   const collectionRef = db.collection(req.params.collection);
 
   collectionRef.get().then((result)=>{
-    const randomIndex = Math.floor(Math.random() * (result["_size"]+1));
+    const randomIndex = Math.floor(Math.random() * (result["_size"]))+1;
     const docRef = db.collection(req.params.collection).doc(""+randomIndex);
 
     docRef.get().then((result)=>{
@@ -43,6 +43,15 @@ app.post("/api/question/:collection", async (req, res)=>{
     }).catch((error) => {
       res.send("Error writing document: ", error);
     });
+  });
+});
+
+
+app.post("/api/questions/check/:collection", async (req, res)=>{
+  const collectionRef = db.collection(req.params.collection);
+
+  collectionRef.where("pytanie","==",req.body.pytanie).get().then((result)=>{
+    res.send(result["size"]>0);
   });
 });
 
