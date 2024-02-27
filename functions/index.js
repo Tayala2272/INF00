@@ -2,6 +2,7 @@
 // Express
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 
 // Routes
@@ -15,38 +16,13 @@ app.get("/api/questions/:collection", async (req, res)=>{
   const collectionRef = db.collection(req.params.collection);
 
   collectionRef.get().then((result)=>{
-    const randomIndex = Math.floor(Math.random() * (result["_size"]+""))+1;
+    const randomIndex = Math.floor(Math.random() * (result["_size"]))+1;
     const docRef = db.collection(req.params.collection).doc(""+randomIndex);
-    
+
     docRef.get().then((result)=>{
       res.send(result.data());
-    }).catch((error)=>{
-      res.send(error);
     });
-    
-  }).catch((error)=>{
-    res.send(error);
   });
-});
-
-app.get("/api/questions/check/:collection", async (req, res)=>{
-  const collectionRef = db.collection(req.params.collection);
-  let question = req.query.pytanie;
-      if (!question) {
-        question = req.body.pytanie;
-      }
-
-  res.send(question)
-    // const query = await collectionRef
-    //   .where("pytanie", "==", question.pytanie)
-    //   .get()
-    //   .then((query)=>{
-    //     res.send(query.docs.length > 0);
-    //   })
-    //   .catch((error)=>{
-    //     console.error(error);
-    //     res.status(500).send(error.message);
-    //   })
 });
 
 
@@ -67,9 +43,16 @@ app.post("/api/questions/:collection", async (req, res)=>{
     }).catch((error) => {
       res.send("Error writing document: ", error);
     });
-  }).catch((error)=>{
-    res.send(error);
-  });;
+  });
+});
+
+
+app.post("/api/questions/check/:collection", async (req, res)=>{
+  const collectionRef = db.collection(req.params.collection);
+
+  collectionRef.where("pytanie","==",req.body.pytanie).get().then((result)=>{
+    res.send(result["size"]>0);
+  });
 });
 
 
