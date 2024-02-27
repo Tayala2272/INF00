@@ -95,8 +95,16 @@ async function dodawanieDoBazy(nowe) {
         body: JSON.stringify(nowe),
       };
 
-      const response = await fetch(url, options);
-      console.log(response);
+      try {
+        const response = await fetch(url, options).then((res)=>{
+
+          console.log("Dodano do bazy :)");
+          main()
+        });
+      } catch (error) {
+      console.log(error);
+      }
+      
 }
 
 
