@@ -1,6 +1,7 @@
 
 // Express
 const express = require("express");
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 
@@ -10,6 +11,7 @@ app.use(express.json());
 // Connect to db
 const {db} = require("./db.js");
 
+app.use(cors({ origin: true }));
 
 // GET
 app.get("/api/questions/:collection", async (req, res)=>{

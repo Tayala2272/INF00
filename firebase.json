@@ -8,7 +8,10 @@
         ".git",
         "firebase-debug.log",
         "firebase-debug.*.log"
-      ]
+      ],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   ],
   "hosting": {

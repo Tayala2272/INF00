@@ -1,23 +1,44 @@
 import "./SingleQuestionForm.css";
-import image from "../assets/react.svg";
 import { useState, useEffect } from "react";
 
 const SingleQuestionForm = () => {
+
   const [pressedButton, setPressedButton] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
-
-  const pytanie = {
-    pytanie: "Które urządzenie sieciowe zostało pokazane na rysunku?",
+  const [pytanie,setPytanie] = useState({
+    pytanie: "",
     odpowiedzi: {
-      odpA: "Adapter Bluetooth",
-      odpB: "Modem USB",
-      odpC: "Adapter IrDA",
-      odpD: "Karta sieciowa WiFi",
+      odpA: "",
+      odpB: "",
+      odpC: "",
+      odpD: "",
     },
-    prawidlowaOdpowiedz: "odpB",
-    obrazek: image,
-  };
+    prawidlowaOdpowiedz: "",
+    obrazek: "Brak",})
+
+    useEffect(() => {
+  const getData = async () => {
+      const response = await fetch('https://app-3ltgtwxjda-uc.a.run.app/api/questions/inf02');
+      const data = await response.json();
+      console.log(data)
+      // Uaktualnij zmienną `pytanie` danymi z API
+      const query = {
+        pytanie: data.pytanie,
+        odpowiedzi: {
+          odpA: data.odpowiedzi.odpA,
+          odpB: data.odpowiedzi.odpB,
+          odpC: data.odpowiedzi.odpC,
+          odpD: data.odpowiedzi.odpD,
+        },
+        prawidlowaOdpowiedz: data.prawidlowaOdpowiedz,
+        obrazek: data.obrazek, // Zakładamy, że `image` to zmienna przechowująca ścieżkę do obrazka
+      };
+
+      setPytanie(query);
+    };
+    getData()
+  },[])
 
   let count = 1;
 
@@ -44,8 +65,8 @@ const SingleQuestionForm = () => {
       <div className="card card-custom bg-dark text-light border border-4 border-secondary rounded">
         <div className="card-body">
           <h3 className="card-title text-center">Pytanie {count++}</h3>
-          {pytanie.obrazek && (
-            <img src={pytanie.obrazek} className="card-img" alt="..." />
+          {pytanie.obrazek !== "Brak" && (
+              <img src={pytanie.obrazek} className="card-img" alt="Wczytywanie zdjęcia" />
           )}
           <h4 className="card-subtitle text-center mb-2">{pytanie.pytanie}</h4>
           <div className="card-text">
